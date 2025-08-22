@@ -12,14 +12,6 @@ interface Associate {
   id: string;
   name: string;
   email: string;
-  phone: string;
-  address: string;
-  membershipDate: string;
-  status: 'active' | 'inactive' | 'pending';
-  membershipType: 'basic' | 'premium' | 'vip';
-  monthlyContribution: number; // Aporte mensual
-  totalContributed: number; // Total aportado
-  currentBalance: number; // Balance actual
 }
 
 interface Loan {
@@ -78,7 +70,7 @@ interface AppState {
   setCurrentView: (view: 'welcome' | 'admin' | 'associates') => void;
   
   // Associate actions
-  addAssociate: (associate: Omit<Associate, 'id' | 'totalContributed' | 'currentBalance'>) => void;
+  addAssociate: (associate: Omit<Associate, 'id'>) => void;
   updateAssociate: (id: string, updates: Partial<Associate>) => void;
   deleteAssociate: (id: string) => void;
   getAssociate: (id: string) => Associate | undefined;
@@ -104,59 +96,27 @@ interface AppState {
   getTotalInterestEarned: () => number;
 }
 
-// Datos de ejemplo para asociados con aportes mensuales
+// Datos de ejemplo para asociados
 const sampleAssociates: Associate[] = [
   {
     id: '1',
     name: 'María González',
-    email: 'maria.gonzalez@email.com',
-    phone: '+34 600 123 456',
-    address: 'Calle Mayor 123, Madrid',
-    membershipDate: '2024-01-15',
-    status: 'active',
-    membershipType: 'premium',
-    monthlyContribution: 500,
-    totalContributed: 2500,
-    currentBalance: 2500
+    email: 'maria.gonzalez@email.com'
   },
   {
     id: '2',
     name: 'Carlos Rodríguez',
-    email: 'carlos.rodriguez@email.com',
-    phone: '+34 600 234 567',
-    address: 'Avenida de la Paz 45, Barcelona',
-    membershipDate: '2024-02-20',
-    status: 'active',
-    membershipType: 'vip',
-    monthlyContribution: 750,
-    totalContributed: 3000,
-    currentBalance: 3000
+    email: 'carlos.rodriguez@email.com'
   },
   {
     id: '3',
     name: 'Ana Martínez',
-    email: 'ana.martinez@email.com',
-    phone: '+34 600 345 678',
-    address: 'Plaza España 7, Valencia',
-    membershipDate: '2024-03-10',
-    status: 'pending',
-    membershipType: 'basic',
-    monthlyContribution: 300,
-    totalContributed: 300,
-    currentBalance: 300
+    email: 'ana.martinez@email.com'
   },
   {
     id: '4',
     name: 'Luis Fernández',
-    email: 'luis.fernandez@email.com',
-    phone: '+34 600 456 789',
-    address: 'Calle Real 89, Sevilla',
-    membershipDate: '2024-01-30',
-    status: 'inactive',
-    membershipType: 'basic',
-    monthlyContribution: 400,
-    totalContributed: 1600,
-    currentBalance: 1600
+    email: 'luis.fernandez@email.com'
   }
 ];
 
@@ -267,9 +227,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   addAssociate: (associate) => set((state) => ({
     associates: [...state.associates, { 
       ...associate, 
-      id: Date.now().toString(),
-      totalContributed: 0,
-      currentBalance: 0
+      id: Date.now().toString()
     }]
   })),
   updateAssociate: (id, updates) => set((state) => ({
@@ -322,9 +280,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   // Calculated values
   getTotalFundBalance: () => {
     const state = get();
-    const totalContributions = state.associates.reduce((sum, associate) => sum + associate.totalContributed, 0);
     const totalLoans = state.loans.reduce((sum, loan) => sum + loan.remainingBalance, 0);
-    return totalContributions - totalLoans;
+    return -totalLoans; // Sin aportes, solo préstamos pendientes
   },
   
   getMonthlyContributions: (month) => {

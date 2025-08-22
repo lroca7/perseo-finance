@@ -6,19 +6,14 @@ const AdminView: React.FC = () => {
   const [showAssociateForm, setShowAssociateForm] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
-    email: '',
-    phone: '',
-    address: '',
-    membershipType: 'basic' as const,
-    status: 'pending' as const,
-    monthlyContribution: 0
+    email: ''
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'monthlyContribution' ? parseFloat(value) || 0 : value
+      [name]: value
     }));
   };
 
@@ -30,26 +25,15 @@ const AdminView: React.FC = () => {
       return;
     }
 
-    if (formData.monthlyContribution <= 0) {
-      addNotification('El aporte mensual debe ser mayor a 0');
-      return;
-    }
-
     const newAssociate = {
-      ...formData,
-      membershipDate: new Date().toISOString().split('T')[0]
+      ...formData
     };
 
     addAssociate(newAssociate);
     addNotification('Asociado registrado exitosamente');
     setFormData({
       name: '',
-      email: '',
-      phone: '',
-      address: '',
-      membershipType: 'basic',
-      status: 'pending',
-      monthlyContribution: 0
+      email: ''
     });
     setShowAssociateForm(false);
   };
@@ -57,12 +41,7 @@ const AdminView: React.FC = () => {
   const resetForm = () => {
     setFormData({
       name: '',
-      email: '',
-      phone: '',
-      address: '',
-      membershipType: 'basic',
-      status: 'pending',
-      monthlyContribution: 0
+      email: ''
     });
     setShowAssociateForm(false);
   };
@@ -155,26 +134,7 @@ const AdminView: React.FC = () => {
                 <span className="text-2xl font-bold text-primary-600">{associates.length}</span>
               </div>
               
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600 dark:text-gray-300">Activos</span>
-                <span className="text-lg font-semibold text-green-600">
-                  {associates.filter(a => a.status === 'active').length}
-                </span>
-              </div>
-              
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600 dark:text-gray-300">Pendientes</span>
-                <span className="text-lg font-semibold text-yellow-600">
-                  {associates.filter(a => a.status === 'pending').length}
-                </span>
-              </div>
 
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600 dark:text-gray-300">Aporte Total</span>
-                <span className="text-lg font-semibold text-blue-600">
-                  €{associates.reduce((sum, a) => sum + a.totalContributed, 0).toLocaleString()}
-                </span>
-              </div>
             </div>
           </div>
         </div>
@@ -263,82 +223,7 @@ const AdminView: React.FC = () => {
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Teléfono
-                  </label>
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                  />
-                </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Dirección
-                  </label>
-                  <input
-                    type="text"
-                    name="address"
-                    value={formData.address}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Aporte Mensual (€) *
-                  </label>
-                  <input
-                    type="number"
-                    name="monthlyContribution"
-                    value={formData.monthlyContribution}
-                    onChange={handleInputChange}
-                    min="0"
-                    step="0.01"
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                    required
-                  />
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    Cantidad que aportará mensualmente al fondo
-                  </p>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Tipo de Membresía
-                  </label>
-                  <select
-                    name="membershipType"
-                    value={formData.membershipType}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                  >
-                    <option value="basic">Básica</option>
-                    <option value="premium">Premium</option>
-                    <option value="vip">VIP</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Estado
-                  </label>
-                  <select
-                    name="status"
-                    value={formData.status}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                  >
-                    <option value="pending">Pendiente</option>
-                    <option value="active">Activo</option>
-                    <option value="inactive">Inactivo</option>
-                  </select>
-                </div>
 
                 <div className="flex space-x-3 pt-4">
                   <button
